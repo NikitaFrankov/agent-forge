@@ -1,0 +1,27 @@
+{
+  "name": "kotlin-executor",
+  "language": "kotlin",
+  "description": "Executor for Kotlin/JVM projects with Gradle",
+  "tools": {
+    "test": "./gradlew test --tests \"{test}\"",
+    "testAll": "./gradlew test",
+    "lint": "./gradlew detekt",
+    "lintFix": "./gradlew detekt --auto-correct",
+    "format": "./gradlew ktlintFormat",
+    "formatCheck": "./gradlew ktlintCheck",
+    "build": "./gradlew build",
+    "clean": "./gradlew clean"
+  },
+  "patterns": {
+    "src_dir": "src/main/kotlin",
+    "test_dir": "src/test/kotlin",
+    "config_files": ["build.gradle.kts", "settings.gradle.kts", "detekt.yml"],
+    "package_pattern": "com/(company)/(project)"
+  },
+  "agents": {
+    "generator": "executors/kotlin/generator.md",
+    "debugger": "executors/kotlin/debugger.md",
+    "tester": "executors/kotlin/tester.md",
+    "reviewer": "executors/kotlin/reviewer.md"
+  }
+}

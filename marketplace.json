@@ -1,0 +1,23 @@
+{
+  "name": "agent-forge",
+  "owner": {
+    "name": "NikitaFrankov",
+    "url": "https://github.com/NikitaFrankov"
+  },
+  "metadata": {
+    "description": "Pluggable development pipeline with executor system",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-forge",
+      "description": "Pluggable development pipeline with executor system. Commands: /forge-run, /forge-idea, /forge-plan, /forge-exec. Executors: kotlin (python/rust planned). Full pipeline from ideation to implementation with two-stage code review.",
+      "version": "1.0.0",
+      "author": {
+        "name": "NikitaFrankov"
+      },
+      "tags": ["pipeline", "kotlin", "development", "automation", "agents"],
+      "source": "."
+    }
+  ]
+}
