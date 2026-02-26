@@ -5,6 +5,7 @@ description: |
   Runs ideation → research → planning → implementation → review.
 
 argument-hint: <ticket> [--executor <name>]
+user_invocable: true
 allowed-tools:
   - Read
   - Write

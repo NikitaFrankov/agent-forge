@@ -1,6 +1,6 @@
 {
   "name": "agent-forge",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pluggable development pipeline with executor system - skeleton + stack-specific executors",
   "author": {
     "name": "NikitaFrankov"
@@ -15,5 +15,27 @@
     "kotlin",
     "rust",
     "python"
+  ],
+  "skills": [
+    {
+      "name": "forge-run",
+      "description": "Full development pipeline from idea to completion. Runs ideation → research → planning → implementation → review.",
+      "path": "core/commands/forge-run.md"
+    },
+    {
+      "name": "forge-idea",
+      "description": "Collect and structure requirements for a new feature. Runs analyst interview → research (if needed) → PRD review loop.",
+      "path": "core/commands/forge-idea.md"
+    },
+    {
+      "name": "forge-plan",
+      "description": "Create detailed implementation plan from PRD. Runs planner → plan-reviewer loop until READY.",
+      "path": "core/commands/forge-plan.md"
+    },
+    {
+      "name": "forge-exec",
+      "description": "Execute Ralph Wiggum implementation loop with executor selection. Fresh context per iteration, single task per iteration, two-stage review.",
+      "path": "core/commands/forge-exec.md"
+    }
   ]
 }

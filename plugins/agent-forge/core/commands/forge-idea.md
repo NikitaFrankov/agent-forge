@@ -5,6 +5,7 @@ description: |
   Runs analyst interview → research (if needed) → PRD review loop.
 
 argument-hint: <ticket>
+user_invocable: true
 allowed-tools:
   - Read
   - Write

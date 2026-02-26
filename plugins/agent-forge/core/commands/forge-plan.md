@@ -5,6 +5,7 @@ description: |
   Runs planner → plan-reviewer loop until READY.
 
 argument-hint: <ticket>
+user_invocable: true
 allowed-tools:
   - Read
   - Write

@@ -5,6 +5,7 @@ description: |
   Fresh context per iteration, single task per iteration, two-stage review.
 
 argument-hint: <ticket> [--executor <name>] [max_iterations]
+user_invocable: true
 allowed-tools:
   - Read
   - Write
