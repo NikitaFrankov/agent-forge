@@ -1,18 +1,7 @@
 ---
 name: forge-plan
-description: |
-  Create detailed implementation plan from PRD.
-  Runs planner → plan-reviewer loop until READY.
-
-argument-hint: <ticket>
+description: Create detailed implementation plan from PRD with iterations and tasks. Use when PRD is ready and you need to plan implementation. Runs planner agent with plan-reviewer loop until READY status.
 user_invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - Task
 ---
 
 # /forge-plan - Implementation Planning

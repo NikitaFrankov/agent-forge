@@ -1,6 +1,6 @@
 #!/bin/bash
 # init.sh - Initialize .agent-forge/ workspace structure
-# Usage: bash ${CLAUDE_PLUGIN_ROOT}/core/scripts/init.sh
+# Usage: bash ${CLAUDE_PLUGIN_ROOT}/scripts/init.sh
 
 set -e
 

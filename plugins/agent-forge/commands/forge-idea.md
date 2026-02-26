@@ -1,19 +1,7 @@
 ---
 name: forge-idea
-description: |
-  Collect and structure requirements for a new feature.
-  Runs analyst interview → research (if needed) → PRD review loop.
-
-argument-hint: <ticket>
+description: Collect and structure requirements for a new feature through structured interviews. Use when starting ideation for a new ticket or feature. Runs analyst interview, optional research, and PRD review loop.
 user_invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - AskUserQuestion
-  - Task
 ---
 
 # /forge-idea - Requirements Collection

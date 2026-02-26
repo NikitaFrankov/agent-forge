@@ -1,20 +1,7 @@
 ---
 name: forge-run
-description: |
-  Full development pipeline from idea to completion.
-  Runs ideation → research → planning → implementation → review.
-
-argument-hint: <ticket> [--executor <name>]
+description: Full development pipeline from idea to implementation. Use when starting a new feature from scratch with complete automation through ideation, research, planning, implementation, and review stages.
 user_invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Grep
-  - Glob
-  - AskUserQuestion
-  - Task
 ---
 
 # /forge-run - Full Development Pipeline

@@ -19,7 +19,7 @@ fi
 if [ -n "$EXPLICIT_EXECUTOR" ]; then
     EXECUTOR="$EXPLICIT_EXECUTOR"
 else
-    EXECUTOR=$(bash "${PLUGIN_ROOT}/core/scripts/detect-executor.sh" "$PROJECT_ROOT")
+    EXECUTOR=$(bash "${PLUGIN_ROOT}/scripts/detect-executor.sh" "$PROJECT_ROOT")
 fi
 
 if [ "$EXECUTOR" = "unknown" ]; then

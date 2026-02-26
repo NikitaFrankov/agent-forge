@@ -1,19 +1,7 @@
 ---
 name: forge-exec
-description: |
-  Execute Ralph Wiggum implementation loop with executor selection.
-  Fresh context per iteration, single task per iteration, two-stage review.
-
-argument-hint: <ticket> [--executor <name>] [max_iterations]
+description: Execute Ralph Wiggum implementation loop with automatic executor selection. Use when plan is ready to implement. Fresh context per iteration, single task per iteration, two-stage code review.
 user_invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Bash
-  - Grep
-  - Glob
-  - Task
 ---
 
 # /forge-exec - Implementation Execution
@@ -47,7 +35,7 @@ Execute the Ralph Wiggum implementation loop with automatic executor selection.
 
 **Auto-detection script:**
 ```bash
-bash ${PLUGIN_ROOT}/core/scripts/detect-executor.sh
+bash ${PLUGIN_ROOT}/scripts/detect-executor.sh
 ```
 
 ## Prerequisites
@@ -90,7 +78,7 @@ Extract: ticket, branch, user_note
 **Step 3a: Detect Executor**
 ```bash
 # Run detection script
-EXECUTOR=$(bash ${PLUGIN_ROOT}/core/scripts/detect-executor.sh)
+EXECUTOR=$(bash ${PLUGIN_ROOT}/scripts/detect-executor.sh)
 
 # Or read from plan
 Read .agent-forge/plan/<ticket>.md
@@ -99,7 +87,7 @@ Look for: ## Executor Selection → Detected: <executor>
 
 **Step 3b: Generate PROMPT.md with Executor Context**
 ```bash
-bash ${PLUGIN_ROOT}/core/scripts/generate-prompt.sh <ticket> [executor]
+bash ${PLUGIN_ROOT}/scripts/generate-prompt.sh <ticket> [executor]
 ```
 
 This script:
