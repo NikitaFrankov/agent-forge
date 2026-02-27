@@ -78,12 +78,6 @@ This iteration uses the **${EXECUTOR}** executor. Follow the patterns and comman
    \`\`\`
    Look for \`## Codebase Patterns\` section at the top.
 
-2. **Verify Correct Branch**
-   \`\`\`bash
-   git branch --show-current
-   \`\`\`
-   Should be: \`feature/${TICKET}-<slug>\`
-
 ---
 
 ## Your Task

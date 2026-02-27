@@ -64,13 +64,7 @@ You **delegate technical decisions** to the appropriate executor:
    ```
    Look for `## Codebase Patterns` section at the top.
 
-2. **Verify Correct Branch**
-   ```bash
-   git branch --show-current
-   ```
-   Should match plan's branch: `feature/<ticket>-<slug>`
-
-3. **Check Plan Status**
+2. **Check Plan Status**
    ```
    Read .agent-forge/plan/<ticket>.md
    ```

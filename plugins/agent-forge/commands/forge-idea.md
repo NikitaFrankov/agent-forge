@@ -30,12 +30,7 @@ Check for:
 - .agent-forge/prd/<ticket>.prd.md (Existing PRD)
 ```
 
-### 2. Create Feature Branch
-```bash
-git checkout -b feature/<ticket>-<slug>
-```
-
-### 3. Create Context Pack
+### 2. Create Context Pack
 ```markdown
 # Context Pack: <ticket>
 
@@ -48,7 +43,7 @@ git checkout -b feature/<ticket>-<slug>
 - what_to_do_now: "Launch analyst agent to conduct interview"
 ```
 
-### 4. Launch Analyst Agent
+### 3. Launch Analyst Agent
 ```
 Task: analyst agent
 - Conduct 8+ rounds of interview via AskUserQuestion
@@ -56,7 +51,7 @@ Task: analyst agent
 - Generate PRD with AIDD sections
 ```
 
-### 5. Research (if AIDD:RESEARCH_HINTS exist)
+### 4. Research (if AIDD:RESEARCH_HINTS exist)
 ```
 Task: researcher agent
 - Investigate codebase for integration points
@@ -64,7 +59,7 @@ Task: researcher agent
 - Identify technical risks
 ```
 
-### 6. PRD Review Loop (up to 5 iterations)
+### 5. PRD Review Loop (up to 5 iterations)
 ```
 Task: prd-reviewer agent
 - Validate PRD completeness
@@ -73,7 +68,7 @@ Task: prd-reviewer agent
 - If NEEDS_WORK → analyst addresses → re-review
 ```
 
-### 7. Completion
+### 6. Completion
 When PRD Status: READY:
 ```
 ## Ideation Complete
@@ -145,4 +140,3 @@ At completion, verify:
 - [ ] PRD exists with AIDD sections
 - [ ] PRD Status: READY
 - [ ] No TBD/TODO in PRD
-- [ ] Feature branch created

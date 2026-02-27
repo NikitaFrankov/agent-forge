@@ -100,9 +100,6 @@ cat > "${FORGE_DIR}/config.yaml" << 'EOF'
 # - Cargo.toml → rust
 # - pyproject.toml → python
 # - package.json → typescript
-
-# Branch naming
-branch_prefix: feature/
 EOF
 
 # Create initial activity file with patterns section
