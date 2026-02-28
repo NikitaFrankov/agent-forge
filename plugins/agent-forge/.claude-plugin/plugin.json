@@ -1,7 +1,7 @@
 {
   "name": "agent-forge",
-  "version": "1.3.0",
-  "description": "Pluggable development pipeline with executor system - skeleton + stack-specific executors",
+  "version": "1.4.0",
+  "description": "Pluggable development pipeline with executor system - workflow commands + stack-specific executors (kotlin, rust, python, typescript, go)",
   "author": {
     "name": "NikitaFrankov"
   },
@@ -14,6 +14,13 @@
     "executor",
     "kotlin",
     "rust",
-    "python"
-  ]
+    "python",
+    "typescript",
+    "go"
+  ],
+  "features": {
+    "executors": ["kotlin", "rust", "python", "typescript", "go", "default"],
+    "workflows": ["init", "feature", "fix", "analyze", "refactor"],
+    "hooks": ["PreToolUse", "SessionStart"]
+  }
 }
