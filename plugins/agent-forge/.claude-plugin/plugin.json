@@ -17,10 +17,5 @@
     "python",
     "typescript",
     "go"
-  ],
-  "features": {
-    "workflows": ["feature", "fix", "analyze", "refactor"],
-    "executors": ["kotlin", "rust", "python", "typescript", "go"],
-    "skills": ["forge-fix"]
-  }
+  ]
 }
