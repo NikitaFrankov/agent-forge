@@ -17,10 +17,5 @@
     "python",
     "typescript",
     "go"
-  ],
-  "features": {
-    "executors": ["kotlin", "rust", "python", "typescript", "go", "default"],
-    "workflows": ["init", "feature", "fix", "analyze", "refactor"],
-    "hooks": ["PreToolUse", "SessionStart"]
-  }
+  ]
 }
