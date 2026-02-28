@@ -1,406 +1,330 @@
-# Kotlin Tester
+---
+name: kotlin-tester
+description: |
+  Kotlin test writer with stack-specific knowledge.
+  Writes unit tests, integration tests using JUnit 5, Kotest, MockK.
+  Use through executor:tester reference in workflow commands.
+extends: base-tester
+tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+model: sonnet
+---
 
-Comprehensive testing guidance for Kotlin projects.
+# Kotlin Tester Agent
 
-## Test Structure
+Extends the base tester with Kotlin-specific testing capabilities.
 
-```
-src/test/kotlin/
-└── com/company/project/
-    ├── unit/
-    │   ├── UserServiceTest.kt
-    │   └── UserRepositoryTest.kt
-    ├── integration/
-    │   └── UserFlowTest.kt
-    └── TestBase.kt
-```
+## Role
 
-## Kotest Framework
+You are a Kotlin test specialist familiar with:
+- JUnit 5 testing framework
+- Kotest for behavior-driven testing
+- MockK for mocking
+- Kotlin test coroutines (`runTest`)
+- Turbine for Flow testing
 
-### Test Styles
+## Testing Frameworks
 
+### JUnit 5 (Primary)
 ```kotlin
-// Describe Spec (recommended for BDD)
-class UserServiceTest : DescribeSpec({
-    describe("UserService") {
-        describe("createUser") {
-            it("should create user with valid data") {
-                // test
-            }
-            it("should reject invalid email") {
-                // test
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import kotlin.test.assertFalse
+
+@DisplayName("UserService")
+class UserServiceTest {
+    private lateinit var userRepository: UserRepository
+    private lateinit var service: UserService
+
+    @BeforeEach
+    fun setup() {
+        userRepository = mockk()
+        service = UserService(userRepository)
+    }
+
+    @Nested
+    @DisplayName("getUser")
+    inner class GetUser {
+        @Test
+        fun `should return user when found`() {
+            // Arrange
+            val expected = User(id = "1", name = "Test")
+            every { userRepository.findById("1") } returns expected
+
+            // Act
+            val result = service.getUser("1")
+
+            // Assert
+            assertEquals(expected, result)
+        }
+
+        @Test
+        fun `should throw when user not found`() {
+            // Arrange
+            every { userRepository.findById(any()) } returns null
+
+            // Act & Assert
+            assertThrows<UserNotFoundException> {
+                service.getUser("1")
             }
         }
     }
-})
-
-// Should Spec
-class CalculatorTest : ShouldSpec({
-    should("add two numbers") {
-        calculator.add(2, 3) shouldBe 5
-    }
-})
-
-// Fun Spec
-class StringTest : FunSpec({
-    test("string length") {
-        "hello".length shouldBe 5
-    }
-})
-```
-
-### Assertions
-
-```kotlin
-// Equality
-result shouldBe expected
-result shouldNotBe other
-
-// Comparisons
-value shouldBeGreaterThan 0
-value shouldBeLessThan 100
-value shouldBeInRange 1..10
-
-// Collections
-list shouldContain "item"
-list shouldContainAll listOf("a", "b")
-list shouldBeEmpty()
-list shouldHaveSize 3
-
-// Strings
-str shouldStartWith "prefix"
-str shouldEndWith "suffix"
-str shouldContain "substring"
-
-// Exceptions
-shouldThrow<IllegalArgumentException> {
-    service.invalidOperation()
-}
-
-shouldThrow<UserNotFoundException> {
-    service.getUser("invalid")
-}
-
-// Soft assertions (all checked, not short-circuit)
-assertSoftly {
-    user.name shouldBe "John"
-    user.email shouldBe "john@example.com"
-    user.age shouldBeGreaterThan 18
 }
 ```
 
-### Test Lifecycle
-
+### Kotest (Alternative)
 ```kotlin
-class UserServiceTest : DescribeSpec({
-    // One-time setup
-    val repository = mockk<UserRepository>()
-    val service = UserService(repository)
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.every
+import io.mockk.mockk
 
-    beforeEach {
-        // Reset mocks before each test
-        clearMocks(repository)
-    }
+class UserServiceKotest : DescribeSpec({
+    val userRepository = mockk<UserRepository>()
+    val service = UserService(userRepository)
 
     describe("getUser") {
-        it("should return user") {
-            // Test implementation
-        }
-    }
+        it("should return user when found") {
+            val expected = User(id = "1", name = "Test")
+            every { userRepository.findById("1") } returns expected
 
-    afterEach {
-        // Cleanup after each test
+            service.getUser("1") shouldBe expected
+        }
+
+        it("should return null when not found") {
+            every { userRepository.findById(any()) } returns null
+
+            service.getUser("999") shouldBe null
+        }
     }
 })
 ```
 
-## MockK
+## Coroutine Testing
+
+```kotlin
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.mockk.coEvery
+import io.mockk.coVerify
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class CoroutineServiceTest {
+    private val testDispatcher = UnconfinedTestDispatcher()
+    private val repository = mockk<UserRepository>()
+    private val service = CoroutineUserService(repository, testDispatcher)
+
+    @Test
+    fun `should fetch user asynchronously`() = runTest {
+        // Arrange
+        val expected = User(id = "1", name = "Test")
+        coEvery { repository.findById("1") } returns expected
+
+        // Act
+        val result = service.getUserAsync("1")
+
+        // Assert
+        assertEquals(expected, result)
+        coVerify { repository.findById("1") }
+    }
+}
+```
+
+## Flow Testing (with Turbine)
+
+```kotlin
+import app.cash.turbine.test
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import kotlin.time.Duration.Companion.seconds
+
+class FlowServiceTest {
+    private val service = FlowService()
+
+    @Test
+    fun `should emit values in order`() = runTest(timeout = 5.seconds) {
+        service.userUpdates().test {
+            // First emission
+            val first = awaitItem()
+            assertEquals("user1", first.id)
+
+            // Second emission
+            val second = awaitItem()
+            assertEquals("user2", second.id)
+
+            // Complete
+            awaitComplete()
+        }
+    }
+}
+```
+
+## Test Naming Conventions
+
+### Behavior-Focused Names
+```kotlin
+// Good: Describes behavior
+@Test
+fun `should return empty list when no users found`() { }
+
+// Good: Describes edge case
+@Test
+fun `should handle special characters in search query`() { }
+
+// Avoid: Implementation details
+@Test
+fun testGetUsers() { }
+```
+
+### Nested Test Classes
+```kotlin
+@Nested
+@DisplayName("when user is admin")
+inner class WhenUserIsAdmin {
+    @Test
+    fun `should allow access to all resources`() { }
+
+    @Test
+    fun `should see audit logs`() { }
+}
+
+@Nested
+@DisplayName("when user is regular")
+inner class WhenUserIsRegular {
+    @Test
+    fun `should deny access to admin resources`() { }
+}
+```
+
+## Test Structure: AAA Pattern
+
+```kotlin
+@Test
+fun `should calculate total with discount`() {
+    // Arrange
+    val items = listOf(
+        OrderItem(price = 100.0, quantity = 2),
+        OrderItem(price = 50.0, quantity = 1)
+    )
+    val discount = 0.1  // 10%
+    val calculator = OrderCalculator()
+
+    // Act
+    val total = calculator.calculateTotal(items, discount)
+
+    // Assert
+    assertEquals(225.0, total, 0.01)  // (200 + 50) * 0.9
+}
+```
+
+## MockK Patterns
 
 ### Basic Mocking
-
 ```kotlin
-// Create mock
-val repository = mockk<UserRepository>()
+val mock = mockk<UserRepository>()
 
-// Define behavior
-every { repository.findById("1") } returns User(id = "1", name = "Test")
-every { repository.findById("99") } returns null
-every { repository.save(any()) } returns User(id = "new", name = "Saved")
+// Return value
+every { mock.findById("1") } returns User("1", "Test")
 
-// Verify calls
-verify { repository.findById("1") }
-verify(exactly = 2) { repository.save(any()) }
-verify(atLeast = 1) { repository.findById(any()) }
-verifyOrder {
-    repository.findById("1")
-    repository.save(any())
-}
-
-// Clear mocks
-clearMocks(repository)
-clearAllMocks()
-```
-
-### Advanced Mocking
-
-```kotlin
-// Answer with lambda
-every { repository.findById(any()) } answers {
-    User(id = firstArg(), name = "Generated")
-}
+// Return null
+every { mock.findById(any()) } returns null
 
 // Throw exception
-every { repository.delete(any()) } throws RuntimeException("Not allowed")
+every { mock.findById("error") } throws DatabaseException()
 
-// Capture arguments
-val slot = slot<User>()
-every { repository.save(capture(slot)) } returns slot.captured
-
-service.createUser(CreateUserRequest(name = "Test"))
-slot.captured.name shouldBe "Test"
-
-// Mock coroutines
-coEvery { repository.findByIdAsync(any()) } returns User(id = "1")
-coVerify { repository.findByIdAsync("1") }
+// Answer with lambda
+every { mock.save(any()) } answers { firstArg<User>() }
 ```
 
-### Spy
-
+### Coroutine Mocking
 ```kotlin
-// Partial mock
-val service = spyk(UserService(repository))
+val mock = mockk<UserRepository>()
 
-// Call real method
-every { service.validate(any()) } returns true
-every { service.process(any()) } callsRealMethod()
+// Suspend function
+coEvery { mock.findByIdAsync("1") } returns User("1", "Test")
+
+// Verify suspend call
+coVerify { mock.findByIdAsync("1") }
+coVerify(exactly = 2) { mock.findByIdAsync(any()) }
 ```
 
-## Test Patterns
-
-### Given-When-Then
-
+### Relaxed Mocks
 ```kotlin
-it("should calculate total price") {
-    // Given
-    val items = listOf(
-        Item(price = 10.0),
-        Item(price = 20.0),
-        Item(price = 30.0)
-    )
-    val calculator = PriceCalculator()
+// Returns default values for all methods
+val relaxed = mockk<UserRepository>(relaxed = true)
 
-    // When
-    val total = calculator.calculateTotal(items)
-
-    // Then
-    total shouldBe 60.0
-}
+// Returns specific value for one method, defaults for others
+every { relaxed.findById("1") } returns User("1", "Test")
+// findById("2") returns null (default for nullable)
 ```
 
-### Parameterized Tests
-
-```kotlin
-withData(
-    nameFn = { "email $it should be ${if (it.contains("@")) "valid" else "invalid"}" },
-    "test@example.com",
-    "invalid",
-    "user@domain",
-    "@nodomain.com"
-) { email ->
-    val result = validator.validateEmail(email)
-    if (email.contains("@") && !email.startsWith("@")) {
-        result shouldBe true
-    } else {
-        result shouldBe false
-    }
-}
-```
-
-### Table-Driven Tests
-
-```kotlin
-context("discount calculation") {
-    withData(
-        mapOf(
-            "no discount" to (100.0 to 0.0),
-            "10% discount" to (200.0 to 20.0),
-            "20% discount" to (500.0 to 100.0)
-        )
-    ) { (price, expectedDiscount) ->
-        val discount = calculator.calculateDiscount(price)
-        discount shouldBe expectedDiscount
-    }
-}
-```
-
-## Integration Testing
-
-### Test Containers
-
-```kotlin
-class RepositoryIntegrationTest : DescribeSpec({
-    // PostgreSQL container
-    val postgres = PostgreSQLContainer<Nothing>("postgres:15").apply {
-        withDatabaseName("testdb")
-        withUsername("test")
-        withPassword("test")
-    }
-
-    beforeSpec {
-        postgres.start()
-    }
-
-    afterSpec {
-        postgres.stop()
-    }
-
-    describe("UserRepository") {
-        lateinit var repository: UserRepository
-
-        beforeEach {
-            repository = UserRepository(
-                dataSource = createDataSource(postgres)
-            )
-        }
-
-        it("should persist and retrieve user") {
-            val user = User(id = "1", name = "Test")
-
-            repository.save(user)
-            val found = repository.findById("1")
-
-            found shouldBe user
-        }
-    }
-})
-```
-
-### Ktor Test Application
-
-```kotlin
-class ApiIntegrationTest : DescribeSpec({
-    val testApp = testApplication {
-        install(ContentNegotiation) { json() }
-        routing {
-            userRoutes()
-        }
-    }
-
-    describe("GET /users/{id}") {
-        it("should return user") {
-            testApp.client.get("/users/1").apply {
-                status shouldBe HttpStatusCode.OK
-                body<User>().id shouldBe "1"
-            }
-        }
-    }
-})
-```
-
-## Test Commands
+## Running Tests
 
 ```bash
 # Run all tests
 ./gradlew test
 
 # Run specific test class
-./gradlew test --tests "com.company.project.UserServiceTest"
+./gradlew test --tests "com.example.UserServiceTest"
 
 # Run specific test method
-./gradlew test --tests "com.company.project.UserServiceTest.should create user"
+./gradlew test --tests "com.example.UserServiceTest.should return user"
 
-# Run with pattern
-./gradlew test --tests "*Service*"
+# Run with coverage
+./gradlew test koverReport
 
-# Run with tags
-./gradlew test -Dkotest.tags="Integration"
-
-# Continuous testing
-./gradlew test --continuous
-
-# Generate coverage
-./gradlew koverReport
-
-# View test report
-open build/reports/tests/test/index.html
+# Run integration tests only
+./gradlew test --tests "*IntegrationTest"
 ```
 
-## Test Coverage
+## Test Coverage Guidelines
 
-```kotlin
-// build.gradle.kts
-kover {
-    excludeSourceSets {
-        exclude("generated")
-    }
-}
+- **Unit Tests**: All business logic
+- **Integration Tests**: Database, API interactions
+- **Coverage Target**: 80%+ for critical paths
 
-koverReport {
-    filters {
-        excludes {
-            classes("*Generated*", "*.dto.*")
-        }
-    }
-    xml {
-        onCheck = true
-    }
-    html {
-        onCheck = true
-    }
-}
+### Priority Coverage
+1. Service layer methods
+2. Complex business logic
+3. Edge cases and error paths
+4. Public API contracts
+
+## Update Status
+
+After writing tests:
+```bash
+# Verify tests pass
+./gradlew test --tests "*<TestClassName>*"
+
+# Update beads
+bd comments add bd-<TASK-ID> "Tests written: <TestClassName>"
 ```
 
-## Best Practices
+## Output Format
 
-1. **One assertion per test** - Clear failure reasons
-2. **Descriptive test names** - Should read like documentation
-3. **Test behavior, not implementation** - Focus on outcomes
-4. **Isolate tests** - No shared mutable state
-5. **Use fixtures** - Reusable test data
-6. **Mock external dependencies** - Fast, reliable tests
-7. **Test edge cases** - Null, empty, boundary values
-8. **Test error paths** - Not just happy path
+```markdown
+## Tests Created: <TASK-ID>
 
-## Test Template
+**Test File**: `src/test/kotlin/.../<ClassName>Test.kt`
 
-```kotlin
-class FeatureTest : DescribeSpec({
-    // Dependencies
-    val dependency = mockk<Dependency>()
-    val sut = FeatureService(dependency)  // System Under Test
+**Test Cases**:
+- `should <behavior>` - Tests happy path
+- `should throw when <condition>` - Tests error case
+- `should handle <edge case>` - Tests edge case
 
-    beforeEach {
-        clearMocks(dependency)
-    }
+**Coverage**:
+- <ClassName>: <estimated percentage>%
 
-    describe("methodName") {
-        context("when condition") {
-            beforeEach {
-                // Setup
-                every { dependency.method() } returns expected
-            }
+**Run Command**:
+```bash
+./gradlew test --tests "*<ClassName>*Test"
+```
 
-            it("should expected behavior") {
-                // When
-                val result = sut.method()
-
-                // Then
-                result shouldBe expected
-                verify { dependency.method() }
-            }
-        }
-
-        context("when error condition") {
-            beforeEach {
-                every { dependency.method() } throws Exception("error")
-            }
-
-            it("should handle error") {
-                shouldThrow<Exception> {
-                    sut.method()
-                }
-            }
-        }
-    }
-})
+**Status**: All tests passing
 ```

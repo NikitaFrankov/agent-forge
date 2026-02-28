@@ -50,10 +50,10 @@ Start deterministic new feature development with full lifecycle management.
 
 ### Stage 4: Implementation (Ralph Wiggum Loop)
 1. For each pending task:
-   - Launch implementer agent
+   - Launch **executor:implementer** agent (stack-specific)
    - Implement single task
-   - Run tests
-   - Launch code-reviewer agent
+   - Run tests (via executor tools)
+   - Launch **executor:reviewer** agent (stack-specific)
    - If APPROVED: commit, mark passing
    - If ISSUES_FOUND: address and re-review
 2. Continue until all tasks passing
@@ -97,7 +97,8 @@ Start deterministic new feature development with full lifecycle management.
         │     IMPLEMENTATION (Ralph Wiggum)   │
         │                                     │
         │  FOR each task:                     │
-        │    implementer → code-reviewer      │
+        │    executor:implementer             │
+        │    executor:reviewer                │
         │    If APPROVED: commit              │
         │    If ISSUES: loop back             │
         │                                     │
@@ -126,15 +127,47 @@ bd-FEATURE-AUTH-OAUTH-001              # Epic (type=epic)
 └── bd-...-digest                      # Final digest
 ```
 
-## Executor Selection
+## Executor System
+
+The pipeline uses **executor:role** references for stack-specific agents:
+
+| Reference | Resolves to |
+|-----------|-------------|
+| `executor:implementer` | `executors/<stack>/implementer.md` |
+| `executor:reviewer` | `executors/<stack>/reviewer.md` |
+| `executor:tester` | `executors/<stack>/tester.md` |
+
+### Executor Selection
 
 **Priority order:**
-1. `.agent-forge/config.yaml` (project config)
-2. Auto-detection from project files:
+1. `.agent-forge/config.yaml` - Explicit `executor: <name>`
+2. Auto-detection from project files (via hooks/resolve-executor.sh):
    - `build.gradle.kts` → kotlin
    - `Cargo.toml` → rust
    - `pyproject.toml` → python
    - `package.json` → typescript
+   - `go.mod` → go
+
+### Context File
+
+After resolution, executor context is written to `.agent-forge/executor.context`:
+```
+executor: kotlin
+executor_source: detected
+executor_display: Kotlin/JVM
+```
+
+### Resolution Flow
+
+```
+Command references: executor:implementer
+         ↓
+Read: .agent-forge/executor.context → executor=kotlin
+         ↓
+Read: executors/kotlin/executor.json → agents.implementer
+         ↓
+Execute: executors/kotlin/implementer.md
+```
 
 ## Verification
 

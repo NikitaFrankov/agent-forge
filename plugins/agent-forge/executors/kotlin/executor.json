@@ -1,27 +1,55 @@
 {
-  "name": "kotlin-executor",
-  "language": "kotlin",
-  "description": "Executor for Kotlin/JVM projects with Gradle",
+  "name": "kotlin",
+  "displayName": "Kotlin/JVM",
+  "description": "Executor for Kotlin projects with Gradle build system. Supports Kover coverage, Detekt linting, Ktlint formatting.",
+  "detection": {
+    "files": ["build.gradle.kts", "settings.gradle.kts", "build.gradle"],
+    "extensions": [".kt", ".kts"],
+    "directories": ["src/main/kotlin", "src/test/kotlin"]
+  },
   "tools": {
     "test": "./gradlew test --tests \"{test}\"",
     "testAll": "./gradlew test",
+    "testCoverage": "./gradlew koverReport",
     "lint": "./gradlew detekt",
     "lintFix": "./gradlew detekt --auto-correct",
     "format": "./gradlew ktlintFormat",
     "formatCheck": "./gradlew ktlintCheck",
     "build": "./gradlew build",
-    "clean": "./gradlew clean"
+    "clean": "./gradlew clean",
+    "assemble": "./gradlew assemble",
+    "check": "./gradlew check"
   },
   "patterns": {
-    "src_dir": "src/main/kotlin",
-    "test_dir": "src/test/kotlin",
-    "config_files": ["build.gradle.kts", "settings.gradle.kts", "detekt.yml"],
-    "package_pattern": "com/(company)/(project)"
+    "srcDir": "src/main/kotlin",
+    "testDir": "src/test/kotlin",
+    "resourcesDir": "src/main/resources",
+    "testResourcesDir": "src/test/resources",
+    "configFiles": ["build.gradle.kts", "settings.gradle.kts", "detekt.yml", "gradle.properties"],
+    "packagePattern": "com/{company}/{project}"
   },
   "agents": {
-    "generator": "executors/kotlin/generator.md",
-    "debugger": "executors/kotlin/debugger.md",
+    "implementer": "executors/kotlin/implementer.md",
+    "reviewer": "executors/kotlin/reviewer.md",
     "tester": "executors/kotlin/tester.md",
-    "reviewer": "executors/kotlin/reviewer.md"
+    "debugger": "executors/kotlin/debugger.md"
+  },
+  "conventions": {
+    "naming": {
+      "classes": "PascalCase",
+      "functions": "camelCase",
+      "properties": "camelCase",
+      "constants": "SCREAMING_SNAKE_CASE",
+      "files": "PascalCase.kt matching class name"
+    },
+    "structure": {
+      "oneClassPerFile": true,
+      "packageMatchesDirectory": true
+    },
+    "testing": {
+      "framework": "JUnit 5, Kotest, or MockK",
+      "naming": "ClassNameTest or ClassNameShould",
+      "location": "Mirror source structure in testDir"
+    }
   }
 }

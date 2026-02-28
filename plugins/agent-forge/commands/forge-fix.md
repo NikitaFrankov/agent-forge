@@ -14,18 +14,6 @@ Execute deterministic bug fix with autonomous diagnosis and verification.
 /forge-fix <описание проблемы>
 ```
 
-**Никаких флагов** - просто команда и описание проблемы на естественном языке.
-
-## Examples
-
-```
-/forge-fix исправить краш приложения при запросе разрешений
-/forge-fix починить утечку памяти в UserService
-/forge-fix исправить некорректное отображение дат в календаре
-/forge-fix устранить дублирование записей в базе данных
-/forge-fix исправить ошибку 500 при загрузке файлов
-```
-
 ## Pipeline Stages
 
 ### Stage 1: Intake
@@ -51,7 +39,7 @@ Execute deterministic bug fix with autonomous diagnosis and verification.
 1. **Regression Test First** - Write test that reproduces the bug
 2. Implement minimal fix
 3. Verify regression test passes
-4. Launch code-reviewer agent
+4. Launch **executor:reviewer** agent (stack-specific)
 5. If APPROVED: commit
 6. If ISSUES_FOUND: address and re-review
 
@@ -95,7 +83,7 @@ Execute deterministic bug fix with autonomous diagnosis and verification.
         │  1. Write regression test   │
         │  2. Implement minimal fix   │
         │  3. Verify test passes      │
-        │  4. code-reviewer           │
+        │  4. executor:reviewer       │
         │                             │
         └─────────────┬───────────────┘
                       │
@@ -162,6 +150,17 @@ Bug fix uses a faster process than feature development:
 | Research phase | Optional | Included in investigation |
 | Test strategy | Planned | Regression test only |
 | Iterations | Multiple (3-5) | Single (1-2) |
+
+## Executor System
+
+The pipeline uses **executor:role** references for stack-specific agents:
+
+| Reference | Resolves to |
+|-----------|-------------|
+| `executor:debugger` | `executors/<stack>/debugger.md` |
+| `executor:reviewer` | `executors/<stack>/reviewer.md` |
+
+Executor is auto-detected from project files or set in `.agent-forge/config.yaml`.
 
 ## Verification Checklist
 

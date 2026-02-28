@@ -110,6 +110,44 @@ If flow type is `analyze`, detect the analysis type from keywords:
 | зависимост*, dependency*, библиотек*, library, package | dependency |
 | (default) | general |
 
+### Phase 3.5: Detect Executor
+
+Detect the project's executor (stack) for stack-specific agent resolution.
+
+**Method 1: Read existing context**
+```bash
+# Check if executor context already exists
+cat .agent-forge/executor.context 2>/dev/null
+```
+
+**Method 2: Run executor resolver**
+```bash
+# Run the auto-detection script
+.claude-plugin/hooks/resolve-executor.sh 2>/dev/null || true
+
+# Read the result
+cat .agent-forge/executor.context
+```
+
+**Method 3: Manual detection** (fallback)
+
+Check for project files:
+| File Exists | Executor |
+|-------------|----------|
+| `build.gradle.kts` | kotlin |
+| `Cargo.toml` | rust |
+| `pyproject.toml` | python |
+| `package.json` + `tsconfig.json` | typescript |
+| `go.mod` | go |
+| (default) | default |
+
+**Store in context:**
+```bash
+# Ensure executor.context exists
+mkdir -p .agent-forge
+echo "executor: <detected>" > .agent-forge/executor.context
+```
+
 ### Phase 4: Create Beads Structure
 
 Create the appropriate beads structure based on flow type:
@@ -197,9 +235,20 @@ Create a Context Pack file for the flow:
 - description: <full description>
 - created: <timestamp>
 - beads_id: bd-<ID>
+- executor: <detected executor name>
+
+## Executor
+- name: <executor>
+- source: <config|detected|fallback>
+- agents:
+  - implementer: executors/<executor>/implementer.md
+  - reviewer: executors/<executor>/reviewer.md
+  - tester: executors/<executor>/tester.md
+  - debugger: executors/<executor>/debugger.md
 
 ## Paths
 - context: .agent-forge/context/<ID>.pack.md
+- executor_context: .agent-forge/executor.context
 - (for feature) prd: .agent-forge/prd/<ID>.prd.md
 - (for feature) plan: .agent-forge/plan/<ID>.md
 - (for fix) diagnosis: .agent-forge/diagnosis/<ID>.md
@@ -226,12 +275,14 @@ Report completion and indicate next agent:
 **ID:** <ID>
 **Flow:** <flow type>
 **Description:** <full description>
+**Executor:** <detected executor> (<source>)
 
 **Beads Structure:**
 - Created: bd-<ID> (and children if applicable)
 - Labels: forge:<flow>, forge:<initial_state>
 
 **Context Pack:** .agent-forge/context/<ID>.pack.md
+**Executor Context:** .agent-forge/executor.context
 
 **Next Agent:** <first agent name>
 

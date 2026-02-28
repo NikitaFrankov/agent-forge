@@ -36,6 +36,17 @@ Execute safe, multi-phase refactoring with rollback capability and behavior pres
 | Automatic Rollback | On any test failure |
 | Progress Tracking | Full history in beads |
 
+## Executor System
+
+The pipeline uses **executor:role** references for stack-specific agents:
+
+| Reference | Resolves to |
+|-----------|-------------|
+| `executor:implementer` | `executors/<stack>/implementer.md` |
+| `executor:reviewer` | `executors/<stack>/reviewer.md` |
+
+Executor is auto-detected from project files or set in `.agent-forge/config.yaml`.
+
 ## Pipeline Stages
 
 ### Phase 0: Snapshot & Baseline
@@ -102,12 +113,12 @@ FOR each phase:
     │   - Record phase start in KV
     │
     ├── 3b. Phase Implementation
-    │   - implementer agent executes phase
+    │   - executor:implementer executes phase
     │   - Run affected tests
     │   - Update phase ISSUE status
     │
     └── 3c. Phase Verification
-        - code-reviewer validates changes
+        - executor:reviewer validates changes
         - Run FULL test suite
         - Compare against BASELINE
         │
@@ -185,11 +196,11 @@ NEXT phase
 │    └───────────────────────┬───────────────────────┘ │
 │                            │                          │
 │    ┌───────────────────────▼───────────────────────┐ │
-│    │  3b. implementer: Execute phase               │ │
+│    │  3b. executor:implementer: Execute phase      │ │
 │    └───────────────────────┬───────────────────────┘ │
 │                            │                          │
 │    ┌───────────────────────▼───────────────────────┐ │
-│    │  3c. code-reviewer + refactor-tester          │ │
+│    │  3c. executor:reviewer + refactor-tester      │ │
 │    │                                               │ │
 │    │      If PASS: → Commit, Continue             │ │
 │    │      If FAIL: → ROLLBACK, Halt               │ │

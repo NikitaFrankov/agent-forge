@@ -14,30 +14,26 @@ Conduct deep codebase analysis with structured report generation and follow-up r
 /forge-analyze <описание анализа>
 ```
 
-**Никаких флагов** - тип анализа определяется автоматически из описания.
-
-## Examples
-
-```
-/forge-analyze проверить безопасность модуля авторизации
-/forge-analyze проанализировать производительность API endpoints
-/forge-analyze найти технический долг в модуле платежей
-/forge-analyze проверить зависимости на уязвимости
-/forge-analyze оценить архитектуру микросервисов
-```
-
 ## Auto-Detected Analysis Types
 
 Coordinator determines analysis type from description keywords:
 
-| Keywords (RU/EN) | Analysis Type | Focus |
-|------------------|---------------|-------|
-| безопасность, уязвимост*, security, vulnerab*, auth | **security** | Vulnerabilities, compliance |
-| производительност*, медленн*, performance, slow*, bottleneck | **performance** | Bottlenecks, optimization |
-| архитектур*, architect*, структура, structure, component | **architecture** | Design, modularity |
-| долг*, качеств*, debt, quality, smell, refactor* | **code-quality** | Technical debt, maintainability |
-| зависимост*, dependency*, библиотек*, library, package | **dependency** | Health, licenses, updates |
-| (default) | **general** | General codebase review |
+| Keywords (RU/EN)                                             | Analysis Type    | Focus                           |
+|--------------------------------------------------------------|------------------|---------------------------------|
+| безопасность, уязвимост*, security, vulnerab*, auth          | **security**     | Vulnerabilities, compliance     |
+| производительност*, медленн*, performance, slow*, bottleneck | **performance**  | Bottlenecks, optimization       |
+| архитектур*, architect*, структура, structure, component     | **architecture** | Design, modularity              |
+| долг*, качеств*, debt, quality, smell, refactor*             | **code-quality** | Technical debt, maintainability |
+| зависимост*, dependency*, библиотек*, library, package       | **dependency**   | Health, licenses, updates       |
+| (default)                                                    | **general**      | General codebase review         |
+
+## Executor System
+
+The analysis pipeline uses flow-specific agents (researcher, synthesizer, reporter).
+Stack-specific executors may be used for:
+- `executor:reviewer` - If creating remediation follow-ups
+
+Executor is auto-detected from project files or set in `.agent-forge/config.yaml`.
 
 ## Pipeline Stages
 

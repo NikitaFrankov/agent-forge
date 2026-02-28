@@ -1,3 +1,15 @@
 {
-  "hooks": {}
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [".claude-plugin/hooks/resolve-executor.sh"]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [".claude-plugin/hooks/resolve-executor.sh"]
+      }
+    ]
+  }
 }

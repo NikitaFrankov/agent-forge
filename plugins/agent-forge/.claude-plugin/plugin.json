@@ -1,6 +1,6 @@
 {
   "name": "agent-forge",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Pluggable development pipeline with executor system - workflow commands + stack-specific executors (kotlin, rust, python, typescript, go)",
   "author": {
     "name": "NikitaFrankov"
