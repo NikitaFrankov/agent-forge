@@ -184,6 +184,87 @@ bd sync
 4. **Test edge cases** - Ensure fix handles all scenarios
 5. **Document the fix** - Help future maintainers
 
+## Enforcement Patterns
+
+This section documents the enforcement mechanisms in forge-fix SKILL.md.
+
+### Iron Law
+
+The single inviolable principle:
+```
+NO TRACKING OR REGRESSION TEST = NOT FIXED
+```
+
+Every bug fix must satisfy both conditions:
+1. Tracked in beads (bd issue exists)
+2. Verified with regression test (test proves fix works)
+
+### Mandatory First Response Protocol
+
+Before any bug fix work begins:
+
+1. **Announce**: "I'm using **forge-fix** to fix this bug with enforced TDD workflow."
+2. **Track**: `bd create --type bug --title "Bug: {description}"`
+3. **Initialize**: Create context pack in `.agent-forge/context/{bug-id}.pack.md`
+4. **Verify**: All prerequisites complete before proceeding
+
+### Stage Gates
+
+Each stage has entry requirements and exit gates:
+
+| Stage | Entry Requires | Exit Gate |
+|-------|---------------|-----------|
+| Intake | Bug description | Bug ID in beads |
+| Investigation | Bug ID | Root cause in KV |
+| Planning | Diagnosis report | Plan status: READY |
+| Implementation | Ready plan | Test passes, review approved |
+| Verification | Test passing | All checks complete |
+
+**GATE protocol:**
+- Checkboxes MUST all be checked before proceeding
+- If any unchecked: STOP and complete
+- No partial credit, no "mostly done"
+
+### Evidence Requirements
+
+Claims require fresh evidence:
+
+| Claim | Proof Command |
+|-------|--------------|
+| Bug tracked | `bd show {id}` shows issue |
+| Root cause found | `bd kv get fix/{id}/diagnosis/root_cause` non-empty |
+| Test fails (before) | `./gradlew test --tests "{Test}"` shows FAILED |
+| Test passes (after) | `./gradlew test --tests "{Test}"` shows SUCCESS |
+| Full suite passes | `./gradlew test` shows 0 failures |
+| Bug closed | `bd show {id}` shows status: closed |
+
+**Evidence protocol:**
+1. Identify proof command
+2. Run fresh (not cached)
+3. Read output
+4. Verify matches expectation
+5. Only then make claim
+
+### Anti-Pattern Enforcement
+
+Common anti-patterns are explicitly documented with:
+- **What happens**: The bad behavior
+- **Result**: Why it fails
+- **Correct approach**: What to do instead
+
+This makes anti-patterns visible and preventable.
+
+### Common Excuses Rejection
+
+Pre-defined list of rationalizations that mean "STOP":
+
+- "This is a simple fix" → Still needs tracking and test
+- "I'll add the test later" → Later never comes
+- "The existing test covers it" → Then why does the bug exist?
+- "Manual testing is enough" → Doesn't prevent recurrence
+
+When an excuse appears, the workflow is being skipped. Follow anyway.
+
 ## Common Anti-Patterns
 
 1. **Fixing symptoms, not root cause**
@@ -191,3 +272,42 @@ bd sync
 3. **Skipping regression test**
 4. **Not running full test suite**
 5. **Over-engineering the solution**
+
+## Troubleshooting
+
+### Skill Not Being Followed
+
+If Claude is not following the forge-fix workflow:
+
+1. **Check skill activation**: Ensure description triggers correctly
+   - User says: "fix this bug", "there's a crash", "error when..."
+
+2. **Verify rigidity level**: SKILL.md should have `rigidity_level: standard`
+
+3. **Check for common issues**:
+   - Skipping first response protocol → Add reminder to CLAUDE.md
+   - Missing gates → Verify GATE sections exist in SKILL.md
+   - No evidence verification → Check Evidence Requirements table
+
+4. **Hook-based enforcement** (advanced):
+   - Add PreToolUse hook to check bd issue before Write/Edit
+   - Add PostToolUse hook to verify tests after implementation
+
+### Stuck at a Gate
+
+If workflow is blocked at a gate:
+
+1. Read the gate requirements
+2. Identify which checkbox is unchecked
+3. Complete the missing item
+4. Re-verify all checkboxes
+5. Proceed only when ALL are checked
+
+### Investigation Not Finding Root Cause
+
+If Stage 2 is stuck:
+
+1. Try `executor:debugger` for stack-specific tools
+2. Use `agent-forge:investigator` for systematic analysis
+3. Escalate to user if more information needed
+4. Document what was tried in KV
